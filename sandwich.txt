@@ -1,0 +1,135 @@
+1)CREATE TABLE TASTES
+
+mysql> CREATE TABLE TASTES(name varchar(25) NOT NULL, filling varchar(25) NOT NULL);
+mysql> describe TASTES;
++---------+-------------+------+-----+---------+-------+
+| Field   | Type        | Null | Key | Default | Extra |
++---------+-------------+------+-----+---------+-------+
+| name    | varchar(25) | NO   |     | NULL    |       |
+| filling | varchar(25) | NO   |     | NULL    |       |
++---------+-------------+------+-----+---------+-------+
+
+2)CREATE TABLE LOCATION
+mysql> CREATE TABLE LOCATION(lname varchar(25) NOT NULL PRIMARY KEY,phone int(10) NOT NULL,address varchar(25) NOT NULL);
+mysql> DESCRIBE LOCATION;
++---------+-------------+------+-----+---------+-------+
+| Field   | Type        | Null | Key | Default | Extra |
++---------+-------------+------+-----+---------+-------+
+| lname   | varchar(25) | NO   | PRI | NULL    |       |
+| phone   | int(10)     | NO   |     | NULL    |       |
+| address | varchar(25) | NO   |     | NULL    |       |
++---------+-------------+------+-----+---------+-------+
+
+3)CREATE TABLE SANDWICHERS
+mysql> CREATE TABLE SANDWICHES
+(
+location varchar(25) NOT NULL,
+bread varchar(25) NOT NULL,
+filling varchar(25) NOT NULL,
+price FLOAT(5,2) NOT NULL,
+FOREIGN KEY (location) REFERENCES LOCATION(lname)
+);
+
+
+mysql> DESCRIBE SANDWICHES;
++----------+-------------+------+-----+---------+-------+
+| Field    | Type        | Null | Key | Default | Extra |
++----------+-------------+------+-----+---------+-------+
+| location | varchar(25) | NO   | MUL | NULL    |       |
+| bread    | varchar(25) | NO   |     | NULL    |       |
+| filling  | varchar(25) | NO   |     | NULL    |       |
+| price    | float(5,2)  | NO   |     | NULL    |       |
++----------+-------------+------+-----+---------+-------+
+
+4)INSERTING VALUE INTO TASTES
+mysql> INSERT INTO TASTES
+    -> VALUES('brown','turkey'),('brown','beef'),('brown','ham'),('jones','cheese'),('green','beef'),('green','turkey'),('green','cheese');
+
+mysql> SELECT * FROM TASTES;
++-------+---------+
+| name  | filling |
++-------+---------+
+| brown | turkey  |
+| brown | beef    |
+| brown | ham     |
+| jones | cheese  |
+| green | beef    |
+| green | turkey  |
+| green | cheese  |
++-------+---------+
+
+5)INSERT VALUE INTO LOCATION
+mysql> INSERT INTO LOCATION
+    -> VALUES('lincoln',6834523,'lincoln place')
+   ,('Oneills',6742134,'pearse st'),
+   ('old nag',7678132,'dame st'),
+   ('buttery',7023421,'college st');
+
+    mysql> SELECT * FROM LOCATION;
++---------+---------+---------------+
+| lname   | phone   | address       |
++---------+---------+---------------+
+| buttery | 7023421 | college st    |
+| lincoln | 6834523 | lincoln place |
+| old nag | 7678132 | dame st       |
+| Oneills | 6742134 | pearse st     |
++---------+---------+---------------+
+
+6)INSERTING VALUES INTO SANDWICHERS
+mysGL> INSERT INTO SANDWICHES VALUES
+    -> ('lincoln','rye','beef',1.35);
+    -> ('lincoln','white','ham',1.30);
+    -> ('old nag','rye','ham',1.40);
+
+mysql> SELECT * FROM SANDWICHES;
++----------+-------+---------+-------+
+| location | bread | filling | price |
++----------+-------+---------+-------+
+| lincoln  | rye   | ham     |  1.25 |
+| oneills  | white | cheese  |  1.20 |
+| oneills  | whole | ham     |  1.25 |
+| old nag  | rye   | beef    |  1.35 |
+| buttery  | white | cheese  |  1.00 |
+| oneills  | white | turkey  |  1.35 |
+| buttery  | white | ham     |  1.10 |
+| lincoln  | rye   | beef    |  1.35 |
+| lincoln  | white | ham     |  1.30 |
+| old nag  | rye   | ham     |  1.40 |
++----------+-------+---------+-------+
+
+SQL QUERIES
+1)mysql> SELECT LOCATION FROM SANDWICHES
+    -> WHERE FILLING IN
+    -> (SELECT FILLING FROM TASTES
+    -> WHERE name = 'jones');
++----------+
+| LOCATION |
++----------+
+| oneills  |
+| buttery  |
++----------+
+
+2)mysql> SELECT location FROM
+    -> TASTES INNER JOIN SANDWICHES
+    -> ON TASTES.filling=SANDWICHES.filling
+    -> WHERE TASTES.name='jones';
++----------+
+| location |
++----------+
+| oneills  |
+| buttery  |
++----------+
+
+
+3)mysql> SELECT location,count(DISTINCT name)
+    -> FROM SANDWICHES INNER JOIN TASTES
+    -> USING(FILLING)
+    -> GROUP BY location;
++----------+----------------------+
+| location | count(distinct name) |
++----------+----------------------+
+| buttery  |                    3 |
+| lincoln  |                    2 |
+| old nag  |                    2 |
+| oneills  |                    3 |
++----------+----------------------+
