@@ -1,0 +1,183 @@
+mysql> CREATE DATABASE LIB;
+
+mysql> USE LIB;
+
+mysql> CREATE TABLE BRANCH(bcode varchar(25) NOT NULL PRIMARY KEY,librarian varc
+har(25) NOT NULL,address varchar(25) NOT NULL);
+
+mysql> DESCRIBE BRANCH;
++-----------+-------------+------+-----+---------+-------+
+| Field     | Type        | Null | Key | Default | Extra |
++-----------+-------------+------+-----+---------+-------+
+| bcode     | varchar(25) | NO   | PRI | NULL    |       |
+| librarian | varchar(25) | NO   |     | NULL    |       |
+| address   | varchar(25) | NO   |     | NULL    |       |
++-----------+-------------+------+-----+---------+-------+
+
+
+mysql> CREATE TABLE TITLES(title varchar(25) NOT NULL PRIMARY KEY,author varchar(25) NOT NULL,publisher varchar(25) NOT NULL);
+
+mysql> DESCRIBE TITLES;
++-----------+-------------+------+-----+---------+-------+
+| Field     | Type        | Null | Key | Default | Extra |
++-----------+-------------+------+-----+---------+-------+
+| title     | varchar(25) | NO   | PRI | NULL    |       |
+| author    | varchar(25) | NO   |     | NULL    |       |
+| publisher | varchar(25) | NO   |     | NULL    |       |
++-----------+-------------+------+-----+---------+-------+
+
+mysql> CREATE TABLE HOLDING(branch varchar(25) NOT NULL,title varchar(25) NOT NULL,copies varchar(25) NOT NULL,FOREIGN KEY(branch) REFERENCES BRANCH(bcode),FOREIGN KEY(title) REFERENCES TITLES(title));
+
+
+mysql> DESCRIBE HOLDING;
++--------+-------------+------+-----+---------+-------+
+| Field  | Type        | Null | Key | Default | Extra |
++--------+-------------+------+-----+---------+-------+
+| branch | varchar(25) | NO   | MUL | NULL    |       |
+| title  | varchar(25) | NO   | MUL | NULL    |       |
+| copies | varchar(25) | NO   |     | NULL    |       |
++--------+-------------+------+-----+---------+-------+
+
+mysql> INSERT INTO BRANCH
+    -> VALUES
+    -> ('B1','john smith','2 anglesea rd')
+    -> ,('B2','mary jones','34 pearse st')
+    -> ,('B3','francis owens','grange x');
+
+mysql> SELECT * FROM BRANCH;
++-------+---------------+---------------+
+| bcode | librarian     | address       |
++-------+---------------+---------------+
+| B1    | john smith    | 2 anglesea rd |
+| B2    | mary jones    | 34 pearse st  |
+| B3    | francis owens | grange x      |
++-------+---------------+---------------+
+
+mysql> INSERT INTO TITLES
+    -> VALUES
+    -> ('susannah','ann brown','macmillan')
+    -> ('how to fish','amy fly','stop press')
+    -> ('a history of dublin','david little','wiley')
+    -> ('computers','blaise pascal','applewoods')
+    -> ('the wife','ann brown','macmillan');
+
+    mysql> SELECT * FROM TITLES;
++---------------------+---------------+------------+
+| title               | author        | publisher  |
++---------------------+---------------+------------+
+| a history of dublin | david little  | wiley      |
+| computers           | blaise pascal | applewoods |
+| how to fish         | amy fly       | stop press |
+| susannah            | ann brown     | macmillan  |
+| the wife            | ann brown     | macmillan  |
++---------------------+---------------+------------+
+
+
+mysql> INSERT INTO HOLDING
+    -> VALUES
+    -> ('B1','susannah',3),
+    -> ('B1','how to fish',2),
+    -> ('B1','a history of dublin',1);
+
+mysql> INSERT INTO HOLDING
+    -> VALUES
+    -> ('B2','how to fish',4),
+    -> ('B2','computers',2),
+    -> ('B2','the wife',3),
+    -> ('B3','a history of dublin',1),
+    -> ('B3','computers',4);
+
+mysql> INSERT INTO HOLDING
+    -> VALUES
+    -> ('B3','susannah',3),
+    -> ('B3','the wife',1);
+
+mysql> SELECT * FROM HOLDING;
++--------+---------------------+--------+
+| branch | title               | copies |
++--------+---------------------+--------+
+| B1     | susannah            | 3      |
+| B1     | how to fish         | 2      |
+| B1     | a history of dublin | 1      |
+| B2     | how to fish         | 4      |
+| B2     | computers           | 2      |
+| B2     | the wife            | 3      |
+| B3     | a history of dublin | 1      |
+| B3     | computers           | 4      |
+| B3     | susannah            | 3      |
+| B3     | the wife            | 1      |
++--------+---------------------+--------+
+
+
+SQL QURIES:
+1)mysql> SELECT title FROM TITLES
+    -> WHERE publisher='macmillan';
++----------+
+| title    |
++----------+
+| susannah |
+| the wife |
+
+2)mysql> SELECT DISTINCT branch FROM HOLDING
+    -> WHERE title IN
+    -> (SELECT title FROM TITLES
+    -> WHERE author='ann brown');
++--------+
+| branch |
++--------+
+| B1     |
+| B3     |
+| B2     |
++--------+
+
+3)mysql> SELECT DISTINCT branch FROM
+    -> HOLDING INNER JOIN TITLES
+    -> USING(title)
+    -> WHERE TITLES.author='ann brown';
++--------+
+| branch |
++--------+
+| B1     |
+| B3     |
+| B2     |
++--------+
+
+
+4)mysql> SELECT branch,SUM(copies) AS NUMBER_OF_COPIES
+    -> FROM TITLES INNER JOIN HOLDING
+    -> USING(title)
+    -> GROUP BY branch;
++--------+------------------+
+| branch | NUMBER_OF_COPIES |
++--------+------------------+
+| B1     |                6 |
+| B2     |                9 |
+| B3     |                9 |
++--------+------------------+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
